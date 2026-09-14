@@ -33,6 +33,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         target_sources(MouseInterceptor PRIVATE
             macosdragshakedetector.h macosdragshakedetector.cpp
         )
+    elseif(WIN32)
+        target_sources(MouseInterceptor PRIVATE
+            windowsdragshakedetector.h windowsdragshakedetector.cpp
+        )
     endif()
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET MouseInterceptor APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -57,6 +61,12 @@ target_link_libraries(MouseInterceptor PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 if(APPLE)
     target_link_libraries(MouseInterceptor PRIVATE
         "-framework CoreGraphics"
+    )
+endif()
+
+if(WIN32)
+    target_link_libraries(MouseInterceptor PRIVATE
+        user32
     )
 endif()
 

@@ -10,6 +10,10 @@
 #include "macosdragshakedetector.h"
 #endif
 
+#ifdef Q_OS_WIN
+#include "windowsdragshakedetector.h"
+#endif
+
 int main(int argc, char *argv[])
 {
     #ifdef Q_OS_LINUX
@@ -27,6 +31,13 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_MAC
     MacOSDragShakeDetector detector;
     QObject::connect(&detector, &MacOSDragShakeDetector::shakeDetected, &a, [] {
+        qInfo() << "Shake detected";
+    });
+#endif
+
+#ifdef Q_OS_WIN
+    WindowsDragShakeDetector detector;
+    QObject::connect(&detector, &WindowsDragShakeDetector::shakeDetected, &a, [] {
         qInfo() << "Shake detected";
     });
 #endif
