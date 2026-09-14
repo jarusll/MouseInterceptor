@@ -1,3 +1,5 @@
+#include "linuxdragshakedetector.h"
+
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
@@ -9,8 +11,6 @@
 #include <linux/input.h>
 
 #include <QDebug>
-
-#include "linuxdragshakedetector.h"
 
 namespace {
 constexpr int kPollTimeoutMs = 100;
