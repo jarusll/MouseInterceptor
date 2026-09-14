@@ -121,10 +121,19 @@ void LinuxDragShakeDetector::workerLoop()
             size_t count = (size_t)bytes / sizeof(struct input_event);
             for (size_t j = 0; j < count; ++j) {
                 const struct input_event &ev = buffer[j];
+                if (ev.type == EV_KEY && ev.code == BTN_LEFT) {
+                    if (ev.value == 1)
+                        leftPressed = true;
+                    else if (ev.value == 0) {
+                        leftPressed = false;
+                        detector.reset();
+                    }
+                    continue;
+                }
                 if (ev.type != EV_REL || ev.code != REL_X)
                     continue;
 
-                if (detector.feed(ev.value))
+                if (leftPressed && detector.feed(ev.value))
                     emit shakeDetected();
             }
         }

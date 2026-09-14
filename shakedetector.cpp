@@ -2,45 +2,56 @@
 
 #include "shakedetector.h"
 
-ShakeDetector::ShakeDetector(int minDelta, size_t reversalsRequired,
-                             std::chrono::milliseconds window)
-    : minDelta(minDelta), reversalsRequired(reversalsRequired), window(window) {}
+ShakeDetector::ShakeDetector(int travelThreshold, size_t completionsRequired,
+                             std::chrono::milliseconds budget)
+    : travelThreshold(travelThreshold),
+      completionsRequired(completionsRequired),
+      budget(budget) {}
 
 bool ShakeDetector::feed(int dx) {
     const auto now = std::chrono::steady_clock::now();
 
-    if (windowActive && now - windowStart > window) {
-        windowActive = false;
-        reversalCount = 0;
-        lastSign = 0;
-    }
-
-    if (std::abs(dx) < minDelta)
+    if (windowStarted && now - windowStart > budget) {
+        reset();
         return false;
+    }
 
     const int sign = dx > 0 ? 1 : -1;
-    if (lastSign == 0) {
-        lastSign = sign;
-        return false;
-    }
-    if (sign == lastSign)
+    if (dx == 0)
         return false;
 
-    if (!windowActive) {
-        windowActive = true;
+    if (direction == 0) {
+        direction = sign;
+        travel = std::abs(dx);
+        windowStarted = true;
         windowStart = now;
-        reversalCount = 0;
+    } else if (sign == direction) {
+        if (!windowCompleted) {
+            travel += std::abs(dx);
+            if (travel >= travelThreshold) {
+                windowCompleted = true;
+                travel = 0;
+                ++completions;
+            }
+        }
+    } else {
+        direction = sign;
+        travel = std::abs(dx);
+        windowCompleted = false;
     }
 
-    ++reversalCount;
-    lastSign = sign;
-
-    if (reversalCount >= reversalsRequired) {
-        windowActive = false;
-        reversalCount = 0;
-        lastSign = 0;
+    if (completions >= completionsRequired) {
+        reset();
         return true;
     }
 
     return false;
+}
+
+void ShakeDetector::reset() {
+    direction = 0;
+    travel = 0;
+    completions = 0;
+    windowStarted = false;
+    windowCompleted = false;
 }

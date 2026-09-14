@@ -6,20 +6,23 @@
 
 class ShakeDetector {
 public:
-    explicit ShakeDetector(int minDelta = 2,
-                           size_t reversalsRequired = 4,
-                           std::chrono::milliseconds window = std::chrono::milliseconds(500));
+    explicit ShakeDetector(int travelThreshold = 20,
+                           size_t completionsRequired = 4,
+                           std::chrono::milliseconds budget = std::chrono::milliseconds(500));
 
     bool feed(int dx);
+    void reset();
 
 private:
-    const int minDelta;
-    const size_t reversalsRequired;
-    const std::chrono::milliseconds window;
+    const int travelThreshold;
+    const size_t completionsRequired;
+    const std::chrono::milliseconds budget;
 
-    int lastSign = 0;
-    size_t reversalCount = 0;
-    bool windowActive = false;
+    int direction = 0;
+    int travel = 0;
+    size_t completions = 0;
+    bool windowStarted = false;
+    bool windowCompleted = false;
     std::chrono::steady_clock::time_point windowStart;
 };
 

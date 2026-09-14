@@ -27,6 +27,7 @@ private:
     std::vector<int> fds;
     std::thread worker;
     std::atomic<bool> running{false};
+    bool leftPressed = false;
 
     ShakeDetector detector;
 };
