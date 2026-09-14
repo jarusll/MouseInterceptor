@@ -29,6 +29,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         target_sources(MouseInterceptor PRIVATE
             linuxdragshakedetector.h linuxdragshakedetector.cpp
         )
+    elseif(APPLE)
+        target_sources(MouseInterceptor PRIVATE
+            macosdragshakedetector.h macosdragshakedetector.cpp
+        )
     endif()
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET MouseInterceptor APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -49,6 +53,12 @@ else()
 endif()
 
 target_link_libraries(MouseInterceptor PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+
+if(APPLE)
+    target_link_libraries(MouseInterceptor PRIVATE
+        "-framework CoreGraphics"
+    )
+endif()
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
